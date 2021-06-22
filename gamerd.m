@@ -1,6 +1,6 @@
 /*
 Building:
-gcc -std=c99 -o gamerd gamerd.m -framework IOKit -framework ApplicationServices
+clang -std=c99 -o gamerd gamerd.m -framework IOKit -framework ApplicationServices
 */
 
 enum {
