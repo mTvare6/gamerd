@@ -112,7 +112,11 @@ void setKeyboardBrightness(float in) {
 
 int main(int argc, char **argv) {
   while (true){
-    for (float i = 0; i < 1; i+=0.01){
+    for (float i = 0; i < 1; i+=0.001){
+      usleep( CubicEaseInOut(i) * 1000 );
+      setKeyboardBrightness(i);
+    }
+    for (float i = 1; i > 0; i-=0.001){
       usleep( CubicEaseInOut(i) * 1000 );
       setKeyboardBrightness(i);
     }
