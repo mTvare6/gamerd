@@ -110,14 +110,17 @@ void setKeyboardBrightness(float in) {
 }
 
 
+#define easer LinearInterpolation
+#define speed 0.0020
+
 int main(int argc, char **argv) {
   while (true){
-    for (float i = 0; i < 1; i+=0.001){
-      usleep( CubicEaseInOut(i) * 1000 );
+    for (float i = 0; i < 1; i+=speed){
+      usleep( easer(i) * 1000 );
       setKeyboardBrightness(i);
     }
-    for (float i = 1; i > 0; i-=0.001){
-      usleep( CubicEaseInOut(i) * 1000 );
+    for (float i = 1; i > 0; i-=speed){
+      usleep( easer(i) * 1000 );
       setKeyboardBrightness(i);
     }
   }
