@@ -1,31 +1,28 @@
-/*
-Building:
-clang -std=c99 -o gamerd gamerd.m -framework IOKit -framework ApplicationServices
-*/
+#include "ease.h"
+#include <CoreFoundation/CoreFoundation.h>
+#include <IOKit/IOKitLib.h>
+#include <mach/mach.h>
+#include <unistd.h>
 
 enum {
-  kGetSensorReadingID = 0,  // getSensorReading(int *, int *)
-  kGetLEDBrightnessID = 1,  // getLEDBrightness(int, int *)
-  kSetLEDBrightnessID = 2,  // setLEDBrightness(int, int, int *)
-  kSetLEDFadeID = 3,        // setLEDFade(int, int, int, int *)
+  kGetSensorReadingID = 0, // getSensorReading(int *, int *)
+  kGetLEDBrightnessID = 1, // getLEDBrightness(int, int *)
+  kSetLEDBrightnessID = 2, // setLEDBrightness(int, int, int *)
+  kSetLEDFadeID = 3,       // setLEDFade(int, int, int, int *)
 };
-
-#include <mach/mach.h>
-#include <IOKit/IOKitLib.h>
-#include <CoreFoundation/CoreFoundation.h>
-#include <unistd.h>
-#include "ease.h"
 
 static io_connect_t dataPort = 0;
 
 io_connect_t getDataPort(void) {
-  kern_return_t     kr;
-  io_service_t      serviceObject;
+  kern_return_t kr;
+  io_service_t serviceObject;
 
-  if (dataPort) return dataPort;
+  if (dataPort)
+    return dataPort;
 
   // Look up a registered IOService object whose class is AppleLMUController
-  serviceObject = IOServiceGetMatchingService(kIOMasterPortDefault, IOServiceMatching("AppleLMUController"));
+  serviceObject = IOServiceGetMatchingService(
+      kIOMasterPortDefault, IOServiceMatching("AppleLMUController"));
 
   if (!serviceObject) {
     printf("Failed to connect to AppleLMUController\n");
@@ -55,14 +52,9 @@ float getKeyboardBrightness(void) {
 
   uint32_t out_brightness;
 
-  kr = IOConnectCallScalarMethod(
-      getDataPort(),
-      kGetLEDBrightnessID,
-      inputValues,
-      inputCount,
-      outputValues,
-      &outputCount
-      );
+  kr =
+      IOConnectCallScalarMethod(getDataPort(), kGetLEDBrightnessID, inputValues,
+                                inputCount, outputValues, &outputCount);
 
   out_brightness = outputValues[0];
 
@@ -79,7 +71,7 @@ float getKeyboardBrightness(void) {
 void setKeyboardBrightness(float in) {
   kern_return_t kr;
 
-  uint64_t inputCount  = 2;
+  uint64_t inputCount = 2;
   uint64_t inputValues[2];
   uint64_t in_unknown = 0;
   uint64_t in_brightness = in * 0xfff;
@@ -92,14 +84,9 @@ void setKeyboardBrightness(float in) {
 
   uint32_t out_brightness;
 
-  kr = IOConnectCallScalarMethod(
-      getDataPort(),
-      kSetLEDBrightnessID,
-      inputValues,
-      inputCount,
-      outputValues,
-      &outputCount
-      );
+  kr =
+      IOConnectCallScalarMethod(getDataPort(), kSetLEDBrightnessID, inputValues,
+                                inputCount, outputValues, &outputCount);
 
   out_brightness = outputValues[0];
 
@@ -109,21 +96,19 @@ void setKeyboardBrightness(float in) {
   }
 }
 
-
 #define easer LinearInterpolation
-#define speed 0.0020
+const float speed = 0.0020;
 
 int main(int argc, char **argv) {
-  while (true){
-    for (float i = 0; i < 1; i+=speed){
-      usleep( easer(i) * 1000 );
+  while (true) {
+    for (float i = 0; i < 1; i += speed) {
+      usleep(easer(i) * 1000);
       setKeyboardBrightness(i);
     }
-    for (float i = 1; i > 0; i-=speed){
-      usleep( easer(i) * 1000 );
+    for (float i = 1; i > 0; i -= speed) {
+      usleep(easer(i) * 1000);
       setKeyboardBrightness(i);
     }
   }
-
   exit(0);
-} 
+}
