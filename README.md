@@ -1,6 +1,6 @@
 # gamerd
 
-Make your Magic Macos keyboard into a gamer keyboard
+make your mac's magic keyboard into a gamer keyboard
 
 ## Building
 
