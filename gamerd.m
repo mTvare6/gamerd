@@ -1,4 +1,4 @@
-#include "ease.h"
+#include "ease.m"
 #include <CoreFoundation/CoreFoundation.h>
 #include <IOKit/IOKitLib.h>
 #include <mach/mach.h>
